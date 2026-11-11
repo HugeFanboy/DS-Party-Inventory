@@ -21,7 +21,7 @@
       "RollHint": "Roll this project with one of your heroes"
     },
     "Drop": {
-      "InvalidType": "{type} items can't be stored on a party. Only treasures, projects and followers can."
+      "InvalidType": "{type} items can't be stored on a party. Only treasures and projects can."
     },
     "Roller": {
       "Title": "Who is working on {project}?",
@@ -45,14 +45,39 @@
       "ShareConfirm": "Set the default ownership of {name} to Owner? Every player will be able to edit the party, its inventory and its projects.",
       "Shared": "All players now own {name}."
     },
+    "Transfer": {
+      "Quantity": "Quantity"
+    },
     "Give": {
       "Label": "Give to Party Member",
       "Title": "Give {item}",
       "Recipient": "Give to",
-      "Quantity": "Quantity",
       "QuantityHint": "The party has {available}.",
       "NoRecipients": "There is no party member you can give this to. You can only give items to characters you own.",
-      "Done": "{recipient} received {quantity} × {item}."
+      "Done": "{recipient} received {quantity} × {item} from {party}'s inventory."
+    },
+    "Deposit": {
+      "Label": "Put in Party Inventory",
+      "Title": "Put {item} in the party inventory",
+      "Party": "Party",
+      "QuantityHint": "{actor} has {available}.",
+      "NoParty": "This character isn't in a party you can add items to.",
+      "GrantsItems": "{item} grants other items to this character, so it can't be moved automatically. Remove it from the sheet first.",
+      "Done": "{actor} put {quantity} × {item} in {party}'s inventory."
+    },
+    "Settings": {
+      "CarryOver": {
+        "Name": "Carry over extra project points",
+        "Hint": "When a party's crafting project is completed with points to spare, start the same project again with the spare points. If they are enough to finish it again, it yields again. Only applies to projects on a party sheet that produce an item or imbuement."
+      }
+    },
+    "CarryOver": {
+      "Done": "{points} spare points carried over to a new {project}."
+    },
+    "Crafting": {
+      "MissingYield": "{project} was completed, but the item it produces could not be found. Nothing was added to the party inventory.",
+      "CreateFailed": "{project} was completed, but {item} could not be added to the party inventory.",
+      "Failed": "Something went wrong while completing {project}. See the console (F12) for details."
     }
   }
 }

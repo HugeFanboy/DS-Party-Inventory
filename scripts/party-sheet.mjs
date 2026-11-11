@@ -1,6 +1,7 @@
 import { MODULE_ID, PARTY_ITEM_TYPES, TAB_INVENTORY, TAB_PROJECTS, modulePath } from "./constants.mjs";
 import { getCareerPointSpenders, rollPartyProject, spendPartyCareerPoints } from "./rolls.mjs";
 import { canGive, getRecipients, giveToMember } from "./transfer.mjs";
+import { createCraftingProject, craftingProjectData } from "./crafting.mjs";
 
 /**
  * Build the party sheet class. This has to happen after the Draw Steel system has loaded,
@@ -27,7 +28,6 @@ export default function createPartyInventorySheet() {
         modifyItemQuantity: this.#modifyItemQuantity,
         giveToMember: this.#giveToMember,
         rollPartyProject: this.#rollPartyProject,
-        rollPartyFollower: this.#rollPartyFollower,
         shareWithPlayers: this.#shareWithPlayers,
       },
     };
@@ -83,11 +83,8 @@ export default function createPartyInventorySheet() {
           break;
         case TAB_PROJECTS:
           context.access = this.#prepareAccess();
-          context.followers = await this.#prepareItemsContext("follower");
-          context.followerFields = models.follower.schema.fields;
           context.projects = await this.#prepareItemsContext("project");
           context.projectFields = models.project.schema.fields;
-          context.showFollowers = this.isEditMode || (context.followers.length > 0);
           context.canRoll = this.document.isOwner;
           break;
       }
@@ -195,6 +192,16 @@ export default function createPartyInventorySheet() {
         },
       };
 
+      // Start crafting through this module, so the project keeps a copy of the treasure it will produce.
+      const craft = options.find(o => o.label === "DRAW_STEEL.Item.project.Craft.FromTreasure.Label");
+      if (craft) {
+        craft.onClick = async (event, target) => {
+          const item = this._getEmbeddedDocument(target);
+          const project = await createCraftingProject(this.actor, item);
+          if (project) ui.notifications.success("DRAW_STEEL.Item.project.Craft.FromTreasure.Notification", { format: { item: item.name } });
+        };
+      }
+
       const index = options.findIndex(o => o.label === "DRAW_STEEL.Item.project.Events.DrawEvent");
       options.splice(index < 0 ? 0 : index, 0, careerPoints);
       options.unshift(giveToMemberEntry);
@@ -245,20 +252,6 @@ export default function createPartyInventorySheet() {
       const project = this._getEmbeddedDocument(target);
       if (project?.type !== "project") return;
       await rollPartyProject(project);
-    }
-
-    /* -------------------------------------------------- */
-
-    /**
-     * Roll one of the party's own followers on a party project.
-     * @this DSPartyInventorySheet
-     * @param {PointerEvent} event   The originating click event.
-     * @param {HTMLElement} target   The capturing HTML element which defined a [data-action].
-     */
-    static async #rollPartyFollower(event, target) {
-      const follower = this._getEmbeddedDocument(target);
-      if (follower?.type !== "follower") return;
-      await follower.system.roll();
     }
 
     /* -------------------------------------------------- */
@@ -337,7 +330,7 @@ export default function createPartyInventorySheet() {
 
       // A treasure dropped on the Projects tab becomes a crafting project, as on the hero sheet
       if (this.#isProjectDrop(event) && (item.type === "treasure")) {
-        return (await this.#createOnTab(TAB_PROJECTS, () => item.system.createProject(this.actor))) ?? null;
+        return (await this.#createOnTab(TAB_PROJECTS, () => createCraftingProject(this.actor, item))) ?? null;
       }
 
       if (!PARTY_ITEM_TYPES.has(item.type)) {
@@ -367,8 +360,7 @@ export default function createPartyInventorySheet() {
         if (!item) return null;
 
         if (projectDrop && (item.type === "treasure")) {
-          const name = game.i18n.format("DRAW_STEEL.Item.project.Craft.ItemName", { name: item.name });
-          return { name, type: "project", "system.yield.document": item.uuid };
+          return craftingProjectData(item);
         }
         if (!PARTY_ITEM_TYPES.has(item.type)) return null;
 
@@ -389,8 +381,8 @@ export default function createPartyInventorySheet() {
       if (!this.isEditable || !effect) return null;
 
       // An imbuement dropped on the Projects tab becomes a crafting project. Parties cannot hold effects otherwise.
-      if (this.#isProjectDrop(event) && (typeof effect.system?.createProject === "function")) {
-        return (await this.#createOnTab(TAB_PROJECTS, () => effect.system.createProject(this.actor))) ?? null;
+      if (this.#isProjectDrop(event) && effect.system?.project) {
+        return (await this.#createOnTab(TAB_PROJECTS, () => createCraftingProject(this.actor, effect))) ?? null;
       }
       return null;
     }

@@ -50,50 +50,5 @@
       <p class="empty-hint">{{localize (ifThen owner "DSPI.Projects.Empty" "DSPI.Projects.EmptyViewOnly")}}</p>
       {{/unless}}
     </section>
-
-    {{! Followers kept by the party as a whole }}
-    {{#if showFollowers}}
-    <section class="item-list-container follower-container">
-      <div class="item-header">
-        <div class="item-column item-name">{{localize "TYPES.Item.follower"}}</div>
-        <div class="item-column item-type">{{followerFields.type.label}}</div>
-        <div class="item-column item-controls">
-          {{#unless isPlay}}
-          {{#with (localize "DRAW_STEEL.SHEET.Add" itemName=(localize "TYPES.Item.follower")) as |addItemTooltip|}}
-          <a class="createDoc" data-action="createDoc" data-document-class="Item" data-type="follower" data-render-sheet="true" data-tooltip-text="{{addItemTooltip}}">
-            <i class="fa-solid fa-plus"></i>
-          </a>
-          {{/with}}
-          {{/unless}}
-        </div>
-      </div>
-      <ol class="item-list follower-list">
-        {{#each followers as |followerContext|}}
-        <li class="item follower draggable expandable-document" data-document-uuid="{{followerContext.item.uuid}}">
-          <div class="item-row">
-            {{#if @root.canRoll}}
-            <div class="item-column item-name rollable" data-action="rollPartyFollower">
-            {{else}}
-            <div class="item-column item-name">
-            {{/if}}
-              <img class="item-image" src="{{followerContext.item.img}}" alt="{{followerContext.item.name}}">
-              <div class="name">
-                <div class="label">{{followerContext.item.name}}</div>
-              </div>
-            </div>
-            <div class="item-column item-type">{{followerContext.item.system.followerType}}</div>
-            <div class="item-column item-controls">
-              <a class="fa-fw fa-solid fa-ellipsis-vertical" data-action="documentListContext"></a>
-              <a class="fa-fw fa-solid fa-angle-{{ifThen followerContext.expanded "down" "right"}}" data-action="toggleDocumentDescription"></a>
-            </div>
-          </div>
-          <div class="document-description item-embed {{#if followerContext.expanded}}expanded{{/if}}">
-            {{#if followerContext.expanded}}{{{followerContext.embed.outerHTML}}}{{/if}}
-          </div>
-        </li>
-        {{/each}}
-      </ol>
-    </section>
-    {{/if}}
   </div>
 </section>
