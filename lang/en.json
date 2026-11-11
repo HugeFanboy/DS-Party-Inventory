@@ -54,7 +54,7 @@
       "Recipient": "Give to",
       "QuantityHint": "The party has {available}.",
       "NoRecipients": "There is no party member you can give this to. You can only give items to characters you own.",
-      "Done": "{recipient} received {quantity} × {item}."
+      "Done": "{recipient} received {quantity} × {item} from {party}'s inventory."
     },
     "Deposit": {
       "Label": "Put in Party Inventory",
@@ -65,14 +65,6 @@
       "GrantsItems": "{item} grants other items to this character, so it can't be moved automatically. Remove it from the sheet first.",
       "Done": "{actor} put {quantity} × {item} in {party}'s inventory."
     },
-    "Log": {
-      "Title": "Transfer Record",
-      "Give": "{actor} received {quantity} × {item}",
-      "Deposit": "{actor} added {quantity} × {item}",
-      "By": "by {user}",
-      "Clear": "Clear Transfer Record",
-      "ClearConfirm": "Erase every entry in this party's transfer record? This can't be undone."
-    },
     "Settings": {
       "CarryOver": {
         "Name": "Carry over extra project points",
@@ -81,6 +73,11 @@
     },
     "CarryOver": {
       "Done": "{points} spare points carried over to a new {project}."
+    },
+    "Crafting": {
+      "MissingYield": "{project} was completed, but the item it produces could not be found. Nothing was added to the party inventory.",
+      "CreateFailed": "{project} was completed, but {item} could not be added to the party inventory.",
+      "Failed": "Something went wrong while completing {project}. See the console (F12) for details."
     }
   }
 }

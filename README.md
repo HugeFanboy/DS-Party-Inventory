@@ -42,7 +42,7 @@ A treasure that has granted other items to the hero is refused, because removing
 
 ### Transfer record
 
-Every move made with a hand button is noted at the bottom of the Inventory tab under **Transfer Record**: who received or added what, how many, when, and which user did it. The party keeps the latest 200 entries, and the Director can clear them. Drag-and-drop copies and manual quantity changes are not recorded.
+Every move made with a hand button shows a notification to the user who made it and writes a line to that user's browser console (F12), for example `ds-party-inventory | Transfer: Ann received 2 × Healing Potion from The Party's inventory. (by Gamemaster, ...)`. Nothing is stored on the party.
 
 ## Projects tab
 
@@ -51,7 +51,9 @@ Every move made with a hand button is noted at the bottom of the Inventory tab u
 - A hero's own followers appear in the same list, so a player's artisan or sage can contribute. The party itself does not hold followers.
 - Right-click a project for **Spend Career Points** (takes them from a hero you own) and **Draw Event**.
 - Breakthrough rolls from the chat card ask for the roller again.
-- When a crafting project is completed, the item it yields is added to the party inventory automatically, stacking onto a matching item if there is one.
+- When a crafting project reaches its goal, the item it yields is added to the party inventory automatically. Consumables and trinkets stack onto a matching item; leveled treasures are always added as a new item. The module does this itself instead of relying on the system, and writes what it did to the console. If the item can't be added, you get an error notification saying why.
+- A crafting project keeps a copy of the treasure it will produce, so it still completes if the original is later given away or deleted.
+- Only projects started from a treasure or imbuement yield an item. Compendium projects such as Build Airship have nothing linked, so completing them adds nothing.
 
 ### Carrying over extra points
 
@@ -63,9 +65,9 @@ With exactly enough points the project simply stays completed. Projects that don
 
 The module registers a sheet class that extends the system's party sheet and makes it the default for party actors. The original sheet stays available under **Configure Sheet**.
 
-It also wraps two methods of the system's project data model, both only for projects owned by a party: `rollPrompt`, so the roll reads its characteristic and skills from the chosen hero, and `completeCraftingProject`, so several completions in a row run one at a time and stack. Projects owned by heroes are not affected.
+It also wraps two methods of the system's project data model, both only for projects owned by a party: `rollPrompt`, so the roll reads its characteristic and skills from the chosen hero, and `completeCraftingProject`, which is switched off because the module grants the yield itself from the `preUpdateItem` and `updateItem` hooks. Projects owned by heroes are not affected.
 
-The hero-sheet button is added through the `renderDrawSteelHeroSheet` hook, and the transfer record is stored in a flag on the party actor.
+The hero-sheet button is added through the `renderDrawSteelHeroSheet` hook.
 
 A small API is exposed at `game.modules.get("ds-party-inventory").api`:
 
@@ -76,7 +78,7 @@ api.rollPartyProject(project, { roller: hero }); // rolls as a specific hero or 
 api.giveToMember(treasure);                      // prompts for recipient and quantity
 api.giveToMember(treasure, { recipient: hero, quantity: 2 });
 api.depositToParty(treasure);                    // hero's treasure into their party's inventory
-api.getTransferLog(party);                       // array of record entries, oldest first
+api.createCraftingProject(party, treasure);      // start crafting a treasure or imbuement
 ```
 
 ## Releasing

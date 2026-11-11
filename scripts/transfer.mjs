@@ -1,63 +1,11 @@
 import { MODULE_ID } from "./constants.mjs";
 
-/** The flag on a party actor that stores its transfer record. */
-export const LOG_FLAG = "transferLog";
-
-/** How many transfers a party remembers. Older entries are dropped. */
-export const LOG_LIMIT = 200;
-
-/* -------------------------------------------------- */
-/*   Transfer record                                  */
-/* -------------------------------------------------- */
-
 /**
- * @typedef TransferLogEntry
- * @property {number} time        When it happened (ms since epoch).
- * @property {string} user        Name of the user who did it.
- * @property {"give"|"deposit"} direction   "give" is stash to hero, "deposit" is hero to stash.
- * @property {string} actor       Name of the hero involved.
- * @property {string} item        Name of the item.
- * @property {number} quantity    How many were moved.
+ * Note a transfer in the browser console. The on-screen notification is shown by the caller.
+ * @param {string} message   The same sentence shown in the notification.
  */
-
-/**
- * Read a party's transfer record, oldest first.
- * @param {Actor} party
- * @returns {TransferLogEntry[]}
- */
-export function getTransferLog(party) {
-  const log = party?.getFlag(MODULE_ID, LOG_FLAG);
-  return Array.isArray(log) ? log : [];
-}
-
-/* -------------------------------------------------- */
-
-/**
- * Add an entry to a party's transfer record. Names are stored as text so the record survives deletions.
- * @param {Actor} party
- * @param {Pick<TransferLogEntry, "direction"|"actor"|"item"|"quantity">} entry
- * @returns {Promise<void>}
- */
-async function recordTransfer(party, entry) {
-  try {
-    const log = getTransferLog(party).slice(-(LOG_LIMIT - 1));
-    log.push({ time: Date.now(), user: game.user.name, ...entry });
-    await party.setFlag(MODULE_ID, LOG_FLAG, log);
-  } catch (err) {
-    // The items have already moved; a failed note must not look like a failed transfer.
-    console.error(`${MODULE_ID} | Could not record a transfer.`, err);
-  }
-}
-
-/* -------------------------------------------------- */
-
-/**
- * Erase a party's transfer record.
- * @param {Actor} party
- * @returns {Promise<Actor>}
- */
-export function clearTransferLog(party) {
-  return party.unsetFlag(MODULE_ID, LOG_FLAG);
+function recordTransfer(message) {
+  console.log(`${MODULE_ID} | Transfer: ${message} (by ${game.user.name}, ${new Date().toLocaleString()})`);
 }
 
 /* -------------------------------------------------- */
@@ -228,8 +176,9 @@ export async function giveToMember(item, { recipient, quantity } = {}) {
   const moved = await moveTreasure(item, recipient, quantity);
   if (!moved) return null;
 
-  await recordTransfer(party, { direction: "give", actor: recipient.name, item: name, quantity: moved });
-  ui.notifications.info("DSPI.Give.Done", { format: { recipient: recipient.name, quantity: moved, item: name } });
+  const format = { recipient: recipient.name, quantity: moved, item: name, party: party.name };
+  ui.notifications.info("DSPI.Give.Done", { format });
+  recordTransfer(game.i18n.format("DSPI.Give.Done", format));
 
   return { recipient, quantity: moved };
 }
@@ -309,8 +258,9 @@ export async function depositToParty(item, { party, quantity } = {}) {
   const moved = await moveTreasure(item, party, quantity);
   if (!moved) return null;
 
-  await recordTransfer(party, { direction: "deposit", actor: actor.name, item: name, quantity: moved });
-  ui.notifications.info("DSPI.Deposit.Done", { format: { actor: actor.name, quantity: moved, item: name, party: party.name } });
+  const format = { actor: actor.name, quantity: moved, item: name, party: party.name };
+  ui.notifications.info("DSPI.Deposit.Done", { format });
+  recordTransfer(game.i18n.format("DSPI.Deposit.Done", format));
 
   return { party, quantity: moved };
 }

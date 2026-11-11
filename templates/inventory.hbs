@@ -66,25 +66,5 @@
     <p class="empty-hint">{{localize (ifThen owner "DSPI.Inventory.Empty" "DSPI.Inventory.EmptyViewOnly")}}</p>
     {{/unless}}
 
-    {{#if log.entries.length}}
-    <details class="transfer-log" {{#if log.open}}open{{/if}}>
-      <summary>{{localize "DSPI.Log.Title"}} ({{log.entries.length}})</summary>
-      <ol>
-        {{#each log.entries as |entry|}}
-        <li>
-          <i class="fa-fw fa-solid {{entry.icon}}" inert></i>
-          <span class="text">{{entry.text}}</span>
-          <span class="meta">{{entry.when}} · {{entry.user}}</span>
-        </li>
-        {{/each}}
-      </ol>
-      {{#if gm}}
-      <button type="button" data-action="clearTransferLog">
-        <i class="fa-solid fa-eraser" inert></i>
-        <span>{{localize "DSPI.Log.Clear"}}</span>
-      </button>
-      {{/if}}
-    </details>
-    {{/if}}
   </div>
 </section>
