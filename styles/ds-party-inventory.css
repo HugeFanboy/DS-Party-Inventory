@@ -1,0 +1,82 @@
+.draw-steel.application.sheet.actor.party {
+  [data-application-part=inventory],
+  [data-application-part=partyProjects] {
+    overflow: hidden;
+    height: 100%;
+
+    .contents {
+      overflow: auto;
+      scrollbar-gutter: stable;
+      height: 100%;
+    }
+
+    .item-list-container:first-child {
+      margin-top: 0;
+    }
+
+    .item-header {
+      line-height: 24px;
+    }
+
+    /* Room for the give button next to the menu and expand controls */
+    &[data-application-part=inventory] .item-controls {
+      width: 60px;
+    }
+
+    .item-echelon {
+      width: 100px;
+    }
+
+    .item-points {
+      width: 100px;
+    }
+
+    .item-type {
+      width: 75px;
+    }
+
+    .item-quantity {
+      width: 75px;
+
+      &.quantity-controls {
+        display: flex;
+        justify-content: center;
+
+        a[data-action=modifyItemQuantity] {
+          padding: 0 5px;
+        }
+
+        .quantity {
+          flex-grow: 1;
+        }
+      }
+    }
+
+    .empty-hint {
+      margin: 1rem;
+      text-align: center;
+      font-style: italic;
+      opacity: 0.75;
+    }
+
+    .access-notice {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 5px;
+      background-color: var(--draw-steel-c-item-header-bg);
+
+      span {
+        flex: 1;
+      }
+
+      button {
+        flex: none;
+        width: auto;
+        white-space: nowrap;
+      }
+    }
+  }
+}
