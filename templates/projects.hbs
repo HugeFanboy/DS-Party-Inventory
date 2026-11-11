@@ -1,0 +1,99 @@
+{{! Shared Projects Tab }}
+<section data-tab="{{tab.id}}" data-group="{{tab.group}}" class="{{tab.cssClass}}">
+  <div class="contents">
+    {{> "modules/ds-party-inventory/templates/access-notice.hbs"}}
+
+    {{! Projects List }}
+    <section class="item-list-container project-list-container">
+      <div class="item-header">
+        <div class="item-column item-name">{{localize "TYPES.Item.project"}}</div>
+        <div class="item-column item-points">{{projectFields.points.label}}</div>
+        <div class="item-column item-type">{{projectFields.type.label}}</div>
+        <div class="item-column item-controls">
+          {{#unless isPlay}}
+          {{#with (localize "DRAW_STEEL.SHEET.Add" itemName=(localize "TYPES.Item.project")) as |addItemTooltip|}}
+          <a class="createDoc" data-action="createDoc" data-document-class="Item" data-type="project" data-render-sheet="true" data-tooltip-text="{{addItemTooltip}}">
+            <i class="fa-solid fa-plus"></i>
+          </a>
+          {{/with}}
+          {{/unless}}
+        </div>
+      </div>
+      <ol class="item-list project-list">
+        {{#each projects as |projectContext|}}
+        <li class="item project draggable expandable-document" data-document-uuid="{{projectContext.item.uuid}}">
+          <div class="item-row">
+            {{#if @root.canRoll}}
+            <div class="item-column item-name rollable" data-action="rollPartyProject" data-tooltip="DSPI.Projects.RollHint">
+            {{else}}
+            <div class="item-column item-name">
+            {{/if}}
+              <img class="item-image" src="{{projectContext.item.img}}" alt="{{projectContext.item.name}}">
+              <div class="name">
+                <div class="label">{{projectContext.item.name}}</div>
+              </div>
+            </div>
+            <div class="item-column item-points">{{projectContext.item.system.points}} / {{ifThen projectContext.item.system.goal projectContext.item.system.goal (localize "DRAW_STEEL.Item.project.Varies")}}</div>
+            <div class="item-column item-type">{{projectContext.item.system.projectType}}</div>
+            <div class="item-column item-controls">
+              <a class="fa-fw fa-solid fa-ellipsis-vertical" data-action="documentListContext"></a>
+              <a class="fa-fw fa-solid fa-angle-{{ifThen projectContext.expanded "down" "right"}}" data-action="toggleDocumentDescription"></a>
+            </div>
+          </div>
+          <div class="document-description item-embed {{#if projectContext.expanded}}expanded{{/if}}">
+            {{#if projectContext.expanded}}{{{projectContext.embed.outerHTML}}}{{/if}}
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+      {{#unless projects.length}}
+      <p class="empty-hint">{{localize (ifThen owner "DSPI.Projects.Empty" "DSPI.Projects.EmptyViewOnly")}}</p>
+      {{/unless}}
+    </section>
+
+    {{! Followers kept by the party as a whole }}
+    {{#if showFollowers}}
+    <section class="item-list-container follower-container">
+      <div class="item-header">
+        <div class="item-column item-name">{{localize "TYPES.Item.follower"}}</div>
+        <div class="item-column item-type">{{followerFields.type.label}}</div>
+        <div class="item-column item-controls">
+          {{#unless isPlay}}
+          {{#with (localize "DRAW_STEEL.SHEET.Add" itemName=(localize "TYPES.Item.follower")) as |addItemTooltip|}}
+          <a class="createDoc" data-action="createDoc" data-document-class="Item" data-type="follower" data-render-sheet="true" data-tooltip-text="{{addItemTooltip}}">
+            <i class="fa-solid fa-plus"></i>
+          </a>
+          {{/with}}
+          {{/unless}}
+        </div>
+      </div>
+      <ol class="item-list follower-list">
+        {{#each followers as |followerContext|}}
+        <li class="item follower draggable expandable-document" data-document-uuid="{{followerContext.item.uuid}}">
+          <div class="item-row">
+            {{#if @root.canRoll}}
+            <div class="item-column item-name rollable" data-action="rollPartyFollower">
+            {{else}}
+            <div class="item-column item-name">
+            {{/if}}
+              <img class="item-image" src="{{followerContext.item.img}}" alt="{{followerContext.item.name}}">
+              <div class="name">
+                <div class="label">{{followerContext.item.name}}</div>
+              </div>
+            </div>
+            <div class="item-column item-type">{{followerContext.item.system.followerType}}</div>
+            <div class="item-column item-controls">
+              <a class="fa-fw fa-solid fa-ellipsis-vertical" data-action="documentListContext"></a>
+              <a class="fa-fw fa-solid fa-angle-{{ifThen followerContext.expanded "down" "right"}}" data-action="toggleDocumentDescription"></a>
+            </div>
+          </div>
+          <div class="document-description item-embed {{#if followerContext.expanded}}expanded{{/if}}">
+            {{#if followerContext.expanded}}{{{followerContext.embed.outerHTML}}}{{/if}}
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+    </section>
+    {{/if}}
+  </div>
+</section>

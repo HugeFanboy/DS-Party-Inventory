@@ -1,0 +1,69 @@
+{{! Shared Inventory Tab }}
+<section data-tab="{{tab.id}}" data-group="{{tab.group}}" class="{{tab.cssClass}}">
+  <div class="contents">
+    {{> "modules/ds-party-inventory/templates/access-notice.hbs"}}
+
+    {{#each treasure as |treasureType|}}
+    {{#if treasureType.showHeader}}
+    <section class="item-list-container treasure-list-container">
+      <div class="item-header">
+        <div class="item-column item-name">{{treasureType.label}}</div>
+        <div class="item-column item-echelon">{{@root.treasureFields.echelon.label}}</div>
+        <div class="item-column item-quantity">{{@root.treasureFields.quantity.label}}</div>
+        <div class="item-column item-controls">
+          {{#if treasureType.showAdd}}
+          {{#with (localize "DRAW_STEEL.SHEET.Add" itemName=(localize "TYPES.Item.treasure")) as |addItemTooltip|}}
+          <a class="createDoc" data-action="createDoc" data-document-class="Item" data-type="treasure" data-render-sheet="true" data-system.category="{{@key}}" data-tooltip-text="{{addItemTooltip}}">
+            <i class="fa-solid fa-plus"></i>
+          </a>
+          {{/with}}
+          {{/if}}
+        </div>
+      </div>
+      <ol class="item-list treasure-list">
+        {{#each treasureType.treasure as |treasureContext|}}
+        <li class="item treasure draggable expandable-document" data-document-uuid="{{treasureContext.item.uuid}}">
+          <div class="item-row">
+            <div class="item-column item-name">
+              <img class="item-image" src="{{treasureContext.item.img}}" alt="{{treasureContext.item.name}}">
+              <div class="name">
+                <div class="label">{{treasureContext.item.name}}</div>
+              </div>
+            </div>
+            <div class="item-column item-echelon">{{localize (concat "DRAW_STEEL.ECHELON." treasureContext.item.system.echelon)}}</div>
+            <div class="item-column item-quantity quantity-controls">
+              {{#if @root.owner}}
+              <a data-action="modifyItemQuantity" data-quantity-modification="decrease">
+                <i class="fa-regular fa-minus"></i>
+              </a>
+              {{/if}}
+              <span class="quantity">{{treasureContext.item.system.quantity}}</span>
+              {{#if @root.owner}}
+              <a data-action="modifyItemQuantity" data-quantity-modification="increase">
+                <i class="fa-regular fa-plus"></i>
+              </a>
+              {{/if}}
+            </div>
+            <div class="item-column item-controls">
+              {{#if @root.canGive}}
+              <a class="fa-fw fa-solid fa-hand-holding-hand" data-action="giveToMember" data-tooltip="DSPI.Give.Label"></a>
+              {{/if}}
+              <a class="fa-fw fa-solid fa-ellipsis-vertical" data-action="documentListContext"></a>
+              <a class="fa-fw fa-solid fa-angle-{{ifThen treasureContext.expanded "down" "right"}}" data-action="toggleDocumentDescription"></a>
+            </div>
+          </div>
+          <div class="document-description item-embed {{#if treasureContext.expanded}}expanded{{/if}}">
+            {{#if treasureContext.expanded}}{{{treasureContext.embed.outerHTML}}}{{/if}}
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+    </section>
+    {{/if}}
+    {{/each}}
+
+    {{#unless hasTreasure}}
+    <p class="empty-hint">{{localize (ifThen owner "DSPI.Inventory.Empty" "DSPI.Inventory.EmptyViewOnly")}}</p>
+    {{/unless}}
+  </div>
+</section>

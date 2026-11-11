@@ -1,0 +1,58 @@
+{
+  "DRAW_STEEL": {
+    "Actor": {
+      "party": {
+        "TABS": {
+          "inventory": "Inventory",
+          "partyProjects": "Projects"
+        }
+      }
+    }
+  },
+  "DSPI": {
+    "SheetLabel": "Draw Steel Party Sheet (Inventory & Projects)",
+    "Inventory": {
+      "Empty": "The party stash is empty. Drag treasure here from a compendium, the Items sidebar or a hero's sheet.",
+      "EmptyViewOnly": "The party stash is empty."
+    },
+    "Projects": {
+      "Empty": "The party has no projects. Drag a project here, or drag a treasure or imbuement here to start crafting it.",
+      "EmptyViewOnly": "The party has no projects.",
+      "RollHint": "Roll this project with one of your heroes"
+    },
+    "Drop": {
+      "InvalidType": "{type} items can't be stored on a party. Only treasures, projects and followers can."
+    },
+    "Roller": {
+      "Title": "Who is working on {project}?",
+      "Label": "Roll as",
+      "Hint": "The project roll uses this character's characteristics and skills. The points go to the party's project.",
+      "Heroes": "Heroes",
+      "Followers": "Followers",
+      "FollowerOf": "{follower} ({hero})",
+      "None": "You need to own a hero in this party to roll on its projects."
+    },
+    "CareerPoints": {
+      "HeroLabel": "Hero",
+      "HeroHint": "Whose career project points should be spent?",
+      "HeroOption": "{hero} ({points} points)"
+    },
+    "Access": {
+      "ViewOnly": "You can look at the party's inventory and projects, but you need Owner permission on this party to change them or roll. Ask your Director.",
+      "DirectorHint": "Some players don't have Owner permission on this party, so they can't add items or roll on its projects.",
+      "Share": "Give all players ownership",
+      "ShareTitle": "Share party with players",
+      "ShareConfirm": "Set the default ownership of {name} to Owner? Every player will be able to edit the party, its inventory and its projects.",
+      "Shared": "All players now own {name}."
+    },
+    "Give": {
+      "Label": "Give to Party Member",
+      "Title": "Give {item}",
+      "Recipient": "Give to",
+      "Quantity": "Quantity",
+      "QuantityHint": "The party has {available}.",
+      "NoRecipients": "There is no party member you can give this to. You can only give items to characters you own.",
+      "Done": "{recipient} received {quantity} × {item}."
+    }
+  }
+}

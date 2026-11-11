@@ -1,0 +1,15 @@
+{{#if access.canShare}}
+<aside class="access-notice">
+  <i class="fa-solid fa-circle-info" inert></i>
+  <span>{{localize "DSPI.Access.DirectorHint"}}</span>
+  <button type="button" data-action="shareWithPlayers">
+    <i class="fa-solid fa-users" inert></i>
+    <span>{{localize "DSPI.Access.Share"}}</span>
+  </button>
+</aside>
+{{else if (not access.isOwner)}}
+<aside class="access-notice">
+  <i class="fa-solid fa-lock" inert></i>
+  <span>{{localize "DSPI.Access.ViewOnly"}}</span>
+</aside>
+{{/if}}
