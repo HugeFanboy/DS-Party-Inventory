@@ -1,6 +1,7 @@
 import { MODULE_ID } from "./constants.mjs";
 import createPartyInventorySheet from "./party-sheet.mjs";
-import { giveToMember } from "./transfer.mjs";
+import { addDepositButtons, clearTransferLog, depositToParty, getTransferLog, giveToMember } from "./transfer.mjs";
+import { onUpdateItem, patchCraftingCompletion, registerCarryOverSetting } from "./carryover.mjs";
 import { chooseRoller, getPartyHeroes, patchProjectRollPrompt, rollPartyProject, spendPartyCareerPoints } from "./rolls.mjs";
 
 /** The id Foundry gives the registered sheet: `${scope}.${class name}`. */
@@ -10,6 +11,8 @@ let sheetId = null;
 
 Hooks.once("init", () => {
   if (game.system.id !== "draw-steel") return;
+
+  registerCarryOverSetting();
 
   const sheetClass = createPartyInventorySheet();
   if (!sheetClass) return;
@@ -28,7 +31,14 @@ Hooks.once("init", () => {
     rollPartyProject,
     spendPartyCareerPoints,
     giveToMember,
+    depositToParty,
+    getTransferLog,
+    clearTransferLog,
   };
+
+  // Hand button on the hero sheet's Equipment tab, and carry-over when a party project is completed
+  Hooks.on("renderDrawSteelHeroSheet", addDepositButtons);
+  Hooks.on("updateItem", onUpdateItem);
 });
 
 /* -------------------------------------------------- */
@@ -49,6 +59,7 @@ Hooks.once("setup", () => {
   if (game.system.id !== "draw-steel") return;
   // The system's data models are registered during its own init, which may run after this module's.
   patchProjectRollPrompt();
+  patchCraftingCompletion();
   ensureDefaultSheet();
 });
 

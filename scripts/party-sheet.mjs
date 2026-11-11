@@ -1,6 +1,6 @@
 import { MODULE_ID, PARTY_ITEM_TYPES, TAB_INVENTORY, TAB_PROJECTS, modulePath } from "./constants.mjs";
 import { getCareerPointSpenders, rollPartyProject, spendPartyCareerPoints } from "./rolls.mjs";
-import { canGive, getRecipients, giveToMember } from "./transfer.mjs";
+import { canGive, clearTransferLog, getRecipients, getTransferLog, giveToMember } from "./transfer.mjs";
 
 /**
  * Build the party sheet class. This has to happen after the Draw Steel system has loaded,
@@ -27,7 +27,7 @@ export default function createPartyInventorySheet() {
         modifyItemQuantity: this.#modifyItemQuantity,
         giveToMember: this.#giveToMember,
         rollPartyProject: this.#rollPartyProject,
-        rollPartyFollower: this.#rollPartyFollower,
+        clearTransferLog: this.#clearTransferLog,
         shareWithPlayers: this.#shareWithPlayers,
       },
     };
@@ -80,14 +80,12 @@ export default function createPartyInventorySheet() {
           context.treasureFields = models.treasure.schema.fields;
           context.hasTreasure = this.actor.itemTypes.treasure.length > 0;
           context.canGive = this.document.isOwner && (getRecipients(this.document).length > 0);
+          context.log = this.#prepareLog();
           break;
         case TAB_PROJECTS:
           context.access = this.#prepareAccess();
-          context.followers = await this.#prepareItemsContext("follower");
-          context.followerFields = models.follower.schema.fields;
           context.projects = await this.#prepareItemsContext("project");
           context.projectFields = models.project.schema.fields;
-          context.showFollowers = this.isEditMode || (context.followers.length > 0);
           context.canRoll = this.document.isOwner;
           break;
       }
@@ -106,6 +104,43 @@ export default function createPartyInventorySheet() {
       const canShare = game.user.isGM && !party.inCompendium
         && game.users.some(user => !user.isGM && !party.testUserPermission(user, "OWNER"));
       return { isOwner: party.isOwner, canShare };
+    }
+
+    /* -------------------------------------------------- */
+
+    /**
+     * Whether the transfer record is unfolded. Kept here so it survives re-renders.
+     * @type {boolean}
+     */
+    #logOpen = false;
+
+    /* -------------------------------------------------- */
+
+    /**
+     * Prepare the transfer record for display, newest first.
+     * @returns {{ open: boolean, entries: { icon: string, when: string, text: string, user: string }[] }}
+     */
+    #prepareLog() {
+      const formatter = new Intl.DateTimeFormat(game.i18n.lang, { dateStyle: "medium", timeStyle: "short" });
+      const entries = getTransferLog(this.document).toReversed().map(entry => {
+        const deposit = entry.direction === "deposit";
+        return {
+          icon: deposit ? "fa-arrow-right-to-bracket" : "fa-arrow-right-from-bracket",
+          when: formatter.format(new Date(entry.time)),
+          text: game.i18n.format(deposit ? "DSPI.Log.Deposit" : "DSPI.Log.Give", entry),
+          user: game.i18n.format("DSPI.Log.By", { user: entry.user }),
+        };
+      });
+      return { open: this.#logOpen, entries };
+    }
+
+    /* -------------------------------------------------- */
+
+    /** @inheritdoc */
+    async _onRender(context, options) {
+      await super._onRender(context, options);
+      const log = this.element.querySelector("details.transfer-log");
+      log?.addEventListener("toggle", () => this.#logOpen = log.open);
     }
 
     /* -------------------------------------------------- */
@@ -250,15 +285,19 @@ export default function createPartyInventorySheet() {
     /* -------------------------------------------------- */
 
     /**
-     * Roll one of the party's own followers on a party project.
+     * Erase the transfer record, after confirmation. Director only.
      * @this DSPartyInventorySheet
      * @param {PointerEvent} event   The originating click event.
      * @param {HTMLElement} target   The capturing HTML element which defined a [data-action].
      */
-    static async #rollPartyFollower(event, target) {
-      const follower = this._getEmbeddedDocument(target);
-      if (follower?.type !== "follower") return;
-      await follower.system.roll();
+    static async #clearTransferLog(event, target) {
+      if (!game.user.isGM) return;
+      const confirmed = await ds.applications.api.DSDialog.confirm({
+        window: { title: "DSPI.Log.Clear", icon: "fa-solid fa-eraser" },
+        content: `<p>${game.i18n.localize("DSPI.Log.ClearConfirm")}</p>`,
+        rejectClose: false,
+      });
+      if (confirmed) await clearTransferLog(this.document);
     }
 
     /* -------------------------------------------------- */

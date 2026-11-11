@@ -1,7 +1,7 @@
 export const MODULE_ID = "ds-party-inventory";
 
 /** Item types a party is allowed to hold. */
-export const PARTY_ITEM_TYPES = new Set(["treasure", "project", "follower"]);
+export const PARTY_ITEM_TYPES = new Set(["treasure", "project"]);
 
 /** Part and tab ids added by this module. "projects" is avoided: the system strips that tab from non-hero sheets. */
 export const TAB_INVENTORY = "inventory";

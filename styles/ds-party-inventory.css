@@ -52,6 +52,53 @@
       }
     }
 
+    .transfer-log {
+      margin: 1rem 0 0.5rem;
+
+      summary {
+        cursor: var(--cursor-pointer);
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 5px;
+        background-color: var(--draw-steel-c-item-header-bg);
+      }
+
+      ol {
+        list-style: none;
+        margin: 0.25rem 0;
+        padding: 0;
+        max-height: 14rem;
+        overflow: auto;
+      }
+
+      li {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        padding: 0.25rem 0.5rem;
+
+        &:nth-child(even) {
+          background-color: var(--draw-steel-c-item-alternating-bg);
+        }
+
+        .text {
+          flex: 1;
+        }
+
+        .meta {
+          flex: none;
+          font-size: var(--font-size-12);
+          opacity: 0.75;
+        }
+      }
+
+      button {
+        width: auto;
+        margin-left: auto;
+        display: flex;
+      }
+    }
+
     .empty-hint {
       margin: 1rem;
       text-align: center;
